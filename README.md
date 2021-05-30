@@ -28,3 +28,8 @@ Currently only a limited set of Binn and Matlab types is supported:
 # Examples
 
 See `testBinn.m` for some encoding/decoding example.
+
+# Contributing
+
+If you find bugs or want support for some other types, feel free to create an issue.
+Pull requests are welcome too.
