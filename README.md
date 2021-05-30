@@ -16,4 +16,15 @@ It will create two mex functions: `binnDecode` and `binnEncode`
 
 # Limitations
 
-Currently only a limited set of Binn types is supported.
+Currently only a limited set of Binn and Matlab types is supported:
+
+| Matlab     | Binn   |
+|------------|--------|
+| struct     | object |
+| row vector | list   |
+| scalar     | number |
+| char array | string |
+
+# Examples
+
+See `testBinn.m` for some encoding/decoding example.
