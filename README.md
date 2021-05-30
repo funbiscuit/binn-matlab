@@ -1,4 +1,4 @@
-#Binn
+# Binn
 
 Matlab MEX functions to decode and encode with Binn format
 
