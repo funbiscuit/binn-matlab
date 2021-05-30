@@ -8,7 +8,7 @@
 #define TYPE_MAP_LEN (sizeof(typeMap)/sizeof(*typeMap))
 
 // map for easier conversion from matlab numeric to binn values
-int typeMap[][2] = {
+static int typeMap[][2] = {
         {BINN_UINT8,  mxUINT8_CLASS},
         {BINN_INT8,   mxINT8_CLASS},
         {BINN_UINT16, mxUINT16_CLASS},
@@ -105,7 +105,7 @@ binn *encode(const mxArray *obj) {
         }
         mwSize rows = mxGetM(obj);
         mwSize cols = mxGetN(obj);
-        if (rows != 1) {
+        if (rows > 1) {
             mexWarnMsgTxt("Only row-vectors are supported");
             return NULL;
         }
