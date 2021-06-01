@@ -137,7 +137,7 @@ mxArray *decodeList(binn *obj) {
 
     // the following approach is far from optimal
 
-    binn_list_get_value(obj, 0, &value);
+    binn_list_get_value(obj, 1, &value);
     int bestType = binn_type(&value);
 
     int bestStorage = bestType & BINN_STORAGE_MASK;
