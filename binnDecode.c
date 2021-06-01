@@ -58,9 +58,39 @@ mxArray *decodeNumber(binn *obj, int mxClassId, int numberSize) {
     mwSize dims = 1;
 
     mxArray *val = mxCreateNumericArray(1, &dims, mxClassId, mxREAL);
-    memcpy(mxGetPr(val), &obj->vint, numberSize);
+    memcpy(mxGetPr(val), obj->ptr, numberSize);
 
     return val;
+}
+
+/**
+ * Returns matlab class id for given binn type
+ * @param binnType
+ * @return
+ */
+int getMatlabNumberType(int binnType) {
+    mxClassID classId = mxUNKNOWN_CLASS;
+    for (int i = 0; i < TYPE_MAP_LEN; ++i) {
+        if (typeMap[i][0] == binnType) {
+            classId = typeMap[i][1];
+            break;
+        }
+    }
+    return classId;
+}
+
+int getTypeSize(int binnType) {
+    int storage = binnType & BINN_STORAGE_MASK;
+
+    if (storage == BINN_STORAGE_BYTE)
+        return 1;
+    if (storage == BINN_STORAGE_WORD)
+        return 2;
+    if (storage == BINN_STORAGE_DWORD)
+        return 4;
+    if (storage == BINN_STORAGE_QWORD)
+        return 8;
+    return 0;
 }
 
 mxArray *decodeObject(binn *obj) {
@@ -149,7 +179,7 @@ mxArray *decodeList(binn *obj) {
     binn_list_foreach(obj, value) {
         int type = binn_type(&value);
 
-        if(!isSupportedNumber(type)) {
+        if (!isSupportedNumber(type)) {
             mexWarnMsgIdAndTxt("MATLAB:binnDecode:unknownType", "List contains unsupported type: 0x%02X", type);
             return NULL;
         }
@@ -227,19 +257,16 @@ mxArray *decodeList(binn *obj) {
             }
         }
     }
-    mxClassID classId = mxUNKNOWN_CLASS;
-    for (int i = 0; i < TYPE_MAP_LEN; ++i) {
-        if (typeMap[i][0] == (bestStorage | bestType)) {
-            classId = typeMap[i][1];
-            break;
-        }
-    }
+    mxClassID classId = getMatlabNumberType(bestStorage | bestType);
     if (classId == mxUNKNOWN_CLASS) {
         // should not happen
+        mexWarnMsgIdAndTxt("MATLAB:binnDecode:unknownType",
+                           "Can't find suitable Matlab type for: 0x%02X", bestStorage | bestType);
         return NULL;
     }
 
-    mxArray *val = mxCreateNumericArray(1, &itemCount, classId, mxREAL);
+    mwSize dims[] = {1, itemCount};
+    mxArray *val = mxCreateNumericArray(2, dims, classId, mxREAL);
     void *arr = mxGetPr(val);
 
     int i = 0;
@@ -289,10 +316,8 @@ mxArray *decode(binn *obj) {
         return decodeObject(obj);
     } else if (obj->type == BINN_LIST) {
         return decodeList(obj);
-    } else if (obj->type == BINN_UINT8) {
-        return decodeNumber(obj, mxUINT8_CLASS, sizeof(uint8_t));
-    } else if (obj->type == BINN_DOUBLE) {
-        return decodeNumber(obj, mxDOUBLE_CLASS, sizeof(double));
+    } else if (isSupportedNumber(obj->type)) {
+        return decodeNumber(obj, getMatlabNumberType(obj->type), getTypeSize(obj->type));
     } else if (obj->type == BINN_STRING) {
         return mxCreateCharMatrixFromStrings(1, (const char **) &(obj->ptr));
     }

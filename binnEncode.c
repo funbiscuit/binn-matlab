@@ -146,9 +146,9 @@ void mexFunction(int nlhs, mxArray *plhs[],
     }
 
     // convert encoded data to uint8 array
-    mwSize len = binn_size(obj);
-    plhs[0] = mxCreateNumericArray(1, &len, mxUINT8_CLASS, mxREAL);
-    memcpy(mxGetPr(plhs[0]), binn_ptr(obj), len);
+    mwSize dims[] = {1, binn_size(obj)};
+    plhs[0] = mxCreateNumericArray(2, dims, mxUINT8_CLASS, mxREAL);
+    memcpy(mxGetPr(plhs[0]), binn_ptr(obj), dims[1]);
 
     binn_free(obj);
 }
