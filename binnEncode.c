@@ -135,15 +135,17 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
     const mxArray *original = prhs[0];
 
-    if (!mxIsStruct(original)) {
-        mexErrMsgTxt("Only structures are supported");
-    }
-
     binn *obj = encode(original);
 
     if (obj == NULL) {
         mexErrMsgTxt("Can't encode provided value");
     }
+    if (binn_size(obj) == 0) {
+        // scalar values will have 0 size, encode them as arrays
+        binn_free(obj);
+        obj = encodeArray(original);
+    }
+
 
     // convert encoded data to uint8 array
     mwSize dims[] = {1, binn_size(obj)};

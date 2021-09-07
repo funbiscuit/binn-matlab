@@ -18,3 +18,13 @@ data.another.row=[234 23 65];
 
 encoded=binnEncode(data);
 decoded=binnDecode(encoded)
+%% test vector
+
+data=[23 346 456 56];
+encoded=binnEncode(data);
+decoded=binnDecode(encoded)
+%% test scalar
+
+data=23;
+encoded=binnEncode(data);
+decoded=binnDecode(encoded)

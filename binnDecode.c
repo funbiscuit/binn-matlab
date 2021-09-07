@@ -355,11 +355,15 @@ void mexFunction(int nlhs, mxArray *plhs[],
     root = binn_open(mxGetPr(initial));
     if (root == NULL) {
         mexErrMsgTxt("Input argument is not a valid binn");
-    } else if (root->type != BINN_OBJECT) {
-        mexErrMsgTxt("Input argument is not a binn object");
     }
 
-    plhs[0] = decode(root);
+    mxArray *field_value = decode(root);
+
+    if (field_value == NULL) {
+        mexErrMsgTxt("Can't decode input argument");
+    }
+
+    plhs[0] = field_value;
 
     binn_free(root);
 }
