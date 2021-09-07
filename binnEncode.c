@@ -39,6 +39,8 @@ static binn *encode(const mxArray *obj);
 
 static binn *encodeStruct(const mxArray *obj);
 
+static binn *encodeCell(const mxArray *obj);
+
 static binn *encodeNumeric(const mxArray *obj);
 
 static binn *encodeString(const mxArray *obj);
@@ -49,6 +51,7 @@ static binn *encodeArray(const mxArray *obj);
 
 static Encoder encoders[] = {
         {mxIsStruct,  encodeStruct},
+        {mxIsCell,    encodeCell},
         {mxIsNumeric, encodeNumeric},
         {mxIsChar,    encodeString},
 };
@@ -122,6 +125,37 @@ static binn *encodeStruct(const mxArray *obj) {
         }
     }
     return encoded;
+}
+
+static binn *encodeCell(const mxArray *obj) {
+    mwSize ndims = mxGetNumberOfDimensions(obj);
+    if (ndims > 2) {
+        mexWarnMsgTxt("Multidimensional data is not supported");
+        return NULL;
+    }
+    size_t rows = mxGetM(obj);
+    size_t cols = mxGetN(obj);
+    if (rows != 1 && cols != 1) {
+        mexWarnMsgTxt("Only rows (1xN) or vectors (Nx1) are supported");
+        return NULL;
+    }
+    if (rows > cols) {
+        cols = rows;
+    }
+
+    binn *list = binn_list();
+
+    for (int i = 0; i < cols; ++i) {
+        binn *item = encode(mxGetCell(obj, i));
+        if (item == NULL) {
+            mexPrintf("Skipped element at index %d in cell array\n", i);
+        } else {
+            binn_list_add_value(list, item);
+            binn_free(item);
+        }
+    }
+
+    return list;
 }
 
 static binn *encodeNumeric(const mxArray *obj) {

@@ -18,6 +18,16 @@ data.another.row=[234 23 65];
 
 encoded=binnEncode(data);
 decoded=binnDecode(encoded)
+%% test cell array
+
+data={};
+data{1}=12;
+data{2}=[12 321 345 54];
+data{3}.id=234;
+data{3}.name='test';
+data{4}={34, 'string', [23 78 23]};
+encoded=binnEncode(data);
+decoded=binnDecode(encoded)
 %% test vector
 
 data=[23 346 456 56];
