@@ -7,6 +7,7 @@ data.name='Samsung Galaxy';
 data.price=299.9;
 data.rowUint=uint8([1 2 3 4 5 6 7 8 9]);
 data.rowDouble=[23 346 456 56];
+data.columnDouble=[23 346 456 56].';
 data.rowSingle=single([23 346 456 56]);
 data.rowUint32=uint32([1 2 3 4 5 6 7 8 9 157645]);
 data.rowInt32=int32([-12545 2 3 4 5 6 7 8 9 154543]);
@@ -26,6 +27,14 @@ data{2}=[12 321 345 54];
 data{3}.id=234;
 data{3}.name='test';
 data{4}={34, 'string', [23 78 23]};
+encoded=binnEncode(data);
+decoded=binnDecode(encoded)
+%% test cell array with numeric data
+
+data={};
+data{1}=12;
+data{2}=43;
+data{3}=32;
 encoded=binnEncode(data);
 decoded=binnDecode(encoded)
 %% test vector

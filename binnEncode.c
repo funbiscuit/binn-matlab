@@ -7,6 +7,10 @@
 
 #define ARRAY_SIZE(arr) (sizeof(arr)/sizeof((arr)[0]))
 
+#if !defined(max)
+#define	max(A, B)	((A) > (B) ? (A) : (B))
+#endif
+
 typedef struct {
     /**
      * Condition whether encoder supports encoding given object
@@ -166,9 +170,12 @@ static binn *encodeNumeric(const mxArray *obj) {
     }
     size_t rows = mxGetM(obj);
     size_t cols = mxGetN(obj);
-    if (rows > 1) {
-        mexWarnMsgTxt("Only row-vectors are supported");
+    if (rows != 1 && cols != 1) {
+        mexWarnMsgTxt("Only rows (1xN) or vectors (Nx1) are supported");
         return NULL;
+    }
+    if (rows > cols) {
+        cols = rows;
     }
 
     if (cols == 1) {
@@ -224,7 +231,7 @@ static binn *encodeArray(const mxArray *obj) {
 
     size_t elemSize = mxGetElementSize(obj);
 
-    size_t cols = mxGetN(obj);
+    size_t cols = max(mxGetM(obj), mxGetN(obj));
     for (int i = 0; i < cols; ++i) {
         binn_list_add(list, type, &data[i * elemSize], 0);
     }

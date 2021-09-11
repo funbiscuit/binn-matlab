@@ -16,24 +16,27 @@ It will create two mex functions: `binnDecode` and `binnEncode`
 
 # Limitations
 
-Currently only a limited set of Binn and Matlab types is supported.
-For example, when encoding there is no support for cells, matrices and column vectors.
-When decoding there is no support for maps and lists with non numeric types.
+Currently only a limited set of Binn and Matlab types is supported. For example, when encoding there is no support for
+matrices (only row-vectors and column-vectors are supported). When decoding there is no support for maps.
 
 ## Encoding
 
-* Input must be a structure
+* Input must be a structure, numeric array (1xN or Nx1) or cell array (1xN or Nx1)
 * Structures are encoded as Binn objects
-* Row vectors are encoded into list of numbers (int compression is used when possible)
+* Numeric and cell arrays are encoded into lists. Int compression is used when possible
 * Scalar values are encoded into appropriate Binn number (also with int compression)
+* If scalar value was used as input, it is encoded into list of one element
 
 ## Decoding
 
 * Input must be a vector of uint8 values
 * Objects are decoded into Matlab structures
-* Only lists of numeric types are supported. When lists contains different types, largest
-one is used for created row vector
+* Lists are decoded to numeric array (if it contatins only numbers)
+* Lists with non-numeric data are decoded to cell arrays
 * Strings are decoded into char arrays
+* Lists are always decoded into rows (1xN) even if when encoded, it was a column (Nx1)
+* Cell arrays, with only scalar numbers, after encoding, will be a list of numbers. So they're decoded into simple
+  numeric arrays
 
 # Examples
 
